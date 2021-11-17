@@ -7,6 +7,8 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract krivago is Ownable {
+    
+    // State variables.
     uint256 hotelId;                        // Hotel ID.
     uint256 bookingId;                      // Booking ID.
     uint256 registerFee;                    // Hotel Registration Fee. Owner controlled.
@@ -25,6 +27,7 @@ contract krivago is Ownable {
         uint256 availableRooms;
         uint256 pricePerNight;
         bool registered;
+        string imgUrl;
     }
     
     struct Booking {
@@ -41,9 +44,12 @@ contract krivago is Ownable {
     mapping(uint256 => Hotel) hotelIdToHotel;
     mapping(uint256 => Booking) bookingIdToBooking;
     
+    
+    // Events.
     event HotelRegistered(uint256 hotelId, Hotel newHotel);
     event Booked(uint256 bookingId, Booking newBooking);
-    event Cancelled(uint256 bookingId, uint256 refund);
+    event Completed(uint256 bookingId, uint256 timestamp);
+    event Cancelled(uint256 bookingId, uint256 refundVisitor, uint256 toHotelOwner, uint256 timestamp);
     
     receive() external payable {}
     
@@ -55,6 +61,8 @@ contract krivago is Ownable {
         lowerRefund = _lowerRefund;
     }
     
+    
+    // Modifiers.
     modifier isRegistered(uint256 _hotelId) {
         require(hotelIdToHotel[_hotelId].registered == true);
         _;
@@ -70,6 +78,13 @@ contract krivago is Ownable {
         _;
     }
     
+    modifier isVisitor(uint256 _bookingId) {
+        require(bookingIdToBooking[_bookingId].visitor == msg.sender);
+        _;
+    }
+    
+    
+    // Owner functions.
     function setRegisterFee(uint256 _registerFee) external onlyOwner {
         registerFee = _registerFee;
     }
@@ -84,15 +99,24 @@ contract krivago is Ownable {
         lowerRefund = _lowerRefund;
     }
     
-    function getContractBalance() public view returns (uint256) {
+    function getContractBalance() external view onlyOwner returns (uint256) {
         return address(this).balance;
     }
     
+    function withdrawFunds(uint256 _amount) external onlyOwner returns (bool) {
+        (bool success, ) = payable(msg.sender).call{value: _amount}("");
+        require(success);
+        return true;
+    } 
+    
+    
+    // Hotel functions.
     function registerHotel(
         string memory _name,
         string memory _address,
         uint256 _totalRooms,
-        uint256 _pricePerNight)
+        uint256 _pricePerNight,
+        string memory _imgUrl)
         external payable returns (bool) {
             
             hotelId += 1;
@@ -103,6 +127,7 @@ contract krivago is Ownable {
                 totalRooms: _totalRooms,
                 availableRooms: _totalRooms,
                 pricePerNight: _pricePerNight,
+                imgUrl: _imgUrl,
                 registered: true
             });
             
@@ -112,13 +137,15 @@ contract krivago is Ownable {
             
             emit HotelRegistered(hotelId, newHotel);
             return true;
-        }
+    }
     
     function getBookingCost(uint256 _hotelId, uint256 _rooms, uint256 _nights) public view returns (uint256) {
         uint256 bookingCost = hotelIdToHotel[_hotelId].pricePerNight * _nights * _rooms;
         return bookingCost;
     }
-        
+    
+    
+    // Visitor functions.
     function bookHotel(
         uint256 _hotelId, 
         uint256 _rooms, 
@@ -154,7 +181,41 @@ contract krivago is Ownable {
             emit Booked(bookingId, newBooking);
             return true;
     }
+    
+    function finish(uint256 _bookingId) external isPlanned(_bookingId) isVisitor(_bookingId) returns (bool) {
+        uint256 hId = bookingIdToBooking[_bookingId].hotelId;
+        uint256 bCost = bookingIdToBooking[_bookingId].bookingCost;
+        
+        // send blocked amount to hotel owner.
+        (bool success, ) = payable(hotelIdToHotel[hId].hotelOwner).call{value: (bCost/100) * maxRefund}("");
+        require(success);
 
+        bookingIdToBooking[_bookingId].status = State.Completed;
+        
+        emit Completed(_bookingId, block.timestamp);
+        return true;
+    }
+    
+    function cancelBooking(uint256 _bookingId) external isPlanned(_bookingId) isVisitor(_bookingId) returns (bool) {
+        uint256 hId = bookingIdToBooking[_bookingId].hotelId;
+        (uint256 refundVisitor, uint256 toHotelOwner) = getRefundAmount(_bookingId);
+        
+        (bool success1, ) = payable(msg.sender).call{value: refundVisitor}("");
+        require(success1);
+        
+        if (toHotelOwner > 0) {
+            (bool success2, ) = payable(hotelIdToHotel[hId].hotelOwner).call{value: toHotelOwner}("");
+            require(success2);
+        }
+
+        hotelIdToHotel[hId].availableRooms += bookingIdToBooking[_bookingId].rooms;
+        bookingIdToBooking[_bookingId].status = State.Cancelled;
+        
+        emit Cancelled(_bookingId, refundVisitor, toHotelOwner, block.timestamp);
+        return true;
+    }
+    
+    // Internal functions.
     function getRefundAmount(uint256 _bookingId) internal view returns (uint256, uint256) {
         uint256 refundVisitor = 0;
         uint256 toHotelOwner = 0;
@@ -169,22 +230,6 @@ contract krivago is Ownable {
         }
         
         return (refundVisitor, toHotelOwner);
-    }
-    
-    function cancelBooking(uint256 _bookingId) external isPlanned(_bookingId) returns (bool) {
-        require(bookingIdToBooking[_bookingId].visitor == msg.sender);
-        
-        uint256 hId = bookingIdToBooking[_bookingId].hotelId;
-        (uint256 refundVisitor, uint256 toHotelOwner) = getRefundAmount(_bookingId);
-        (bool success1, ) = payable(msg.sender).call{value: refundVisitor}("");
-        require(success1);
-        (bool success2, ) = payable(hotelIdToHotel[hId].hotelOwner).call{value: toHotelOwner}("");
-        require(success2);
-        
-        hotelIdToHotel[hId].availableRooms += bookingIdToBooking[_bookingId].rooms;
-        bookingIdToBooking[_bookingId].status = State.Cancelled;
-        emit Cancelled(_bookingId, refundVisitor);
-        return true;
     }
     
 }
