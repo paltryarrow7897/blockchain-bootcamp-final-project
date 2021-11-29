@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    
+    <link rel="stylesheet" href="jquery-ui.min.css">
+    <script src="jquery.js"></script>
+    <script src="jquery-ui.min.js"></script>
+</head>
+
+<body>
+    <style>
+        html {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: auto;
+            color: #666;
+        }
+
+        .imageContainer {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .imageContainer img {
+            width: 100%;
+            height: auto;
+        }
+
+        #checkoutForm {
+            padding: 15px;
+            border: 1px solid #666;
+            background: #fff;
+            display: none;
+        }
+  
+        #checkout {
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        #cancelBookingForm {
+            padding: 15px;
+            border: 1px solid #666;
+            background: #fff;
+            display: none;
+        }
+  
+        #cancelBooking {
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        #bookHotelForm {
+            padding: 15px;
+            border: 1px solid #666;
+            background: #fff;
+            display: none;
+        }
+  
+        #bookHotel {
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        #registerHotelForm {
+            padding: 15px;
+            border: 1px solid #666;
+            background: #fff;
+            display: none;
+        }
+  
+        #registerHotel {
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+
+    </style>
+
+    <div> Commission free Hotel Booking Dapp. </div>
+    <br>
+    <div id = "mm-detected"></div>
+    <br>
+    <div>
+        <button id="mm-connect"> Connect MetaMask </button>
+    </div>
+    <br>
+    <div id="mm-current-account"></div>
+    <br>
+
+    <div id="getLatestPriceDiv">
+        <button id="getLatestPrice"> Get Latest USD/ETH Price </button><br><br>
+        <div id="latestPrice"></div>
+    </div><br><br>
+
+    <div id="hotelRegistrationDiv">
+        <button id='registerHotel'>Register Your Hotel</button>
+        <br>
+        <form id="registerHotelForm">
+            <label for="hotelName"> Hotel Name: </label><input type="text" name="hotelName" id="hotelName"><br><br>
+            <label for="hotelAddress"> Hotel Address: </label><input type="text" name="hotelAddress" id="hotelAddress"><br><br>
+            <label for="hotelTotalRooms"> Total Rooms: </label><input type="number" name="hotelTotalRooms" id="hotelTotalRooms"><br><br>
+            <label for="hotelPricePerNight"> Price Per Night in USD: </label><input type="number" name="hotelPricePerNight" id="hotelPricePerNight"><br><br>
+            <label for="hotelImgUrl"> Image URL: </label><input type="url" name="hotelImgUrl" id="hotelImgUrl"><br><br>
+            <button type="button" id="submitRegisterHotel"> Submit </button>
+        </form>
+        <br>
+    </div><br><br>
+
+    <div id="bookHotelDiv">
+        <button id="bookHotel">Book Hotel</button>
+        <br>
+        <form id="bookHotelForm">
+            <label for="bookHotelId"> Hotel ID: </label><input type="number" name="bookHotelId" id="bookHotelId"><br><br>
+            <label for="bookRooms"> Rooms: </label><input type="number" name="bookRooms" id="bookRooms"><br><br>
+            <label for="fromDate"> From: </label><input type="text" name="fromDate" id="fromDate"><input type="text" name="epochFromDate" id="epochFromDate"><br><br>
+            <label for="toDate"> To: </label><input type="text" name="toDate" id="toDate"><input type="text" name="epochToDate" id="epochToDate"><br><br>
+            <button type="button" id="submitBookHotel"> Submit </button>
+        </form>
+        <br>
+    </div><br><br>
+
+    <div id="userBookingsDiv">
+        <button id="userBookings">See Your Bookings</button>
+        <br><br>
+        <div id="userBookingsPlaceholderDiv"></div>
+        <br><br>
+        <button id="cancelBooking">Cancel Booking</button>
+        <br>
+        <form id="cancelBookingForm">
+            <label for="cancelBookingId"> Booking ID: </label><input type="number" name="cancelBookingId" id="cancelBookingId"><br><br>
+            <button type="button" id="submitCancelBooking"> Submit </button>
+        </form>
+        <br><br>
+        <button id="checkout">Checkout</button>
+        <br>
+        <form id="checkoutForm">
+            <label for="checkoutBooking"> Checkout Booking ID: </label><input type="number" name="checkoutBooking" id="checkoutBooking"><br><br>
+            <button type="button" id="submitCheckout"> Submit </button>
+        </form>
+        <br><br>
+    </div>
+
+    <div id="seeAllHotelsDiv">
+        <button id="seeAllHotels">See All Hotels</button>
+        <br><br>
+        <div id="hotelsPlaceholderDiv"></div>
+    </div>
+
+    <script>
+        $("#fromDate").datepicker({minDate: 1, maxDate: "+1W", altField: "#epochFromDate", altFormat: "@"});
+        $("#toDate").datepicker({minDate: $("#fromDate").value + 1, altField: "#epochToDate", altFormat: "@"});
+
+        $(document).ready(function() {
+            $("#registerHotel").click(function() {
+                $("#registerHotelForm").toggle();
+            });
+
+            $("#bookHotel").click(function() {
+                $("#bookHotelForm").toggle();
+            });
+
+            $("#cancelBooking").click(function() {
+                $("#cancelBookingForm").toggle();
+            });
+
+            $("#checkout").click(function() {
+                $("#checkoutForm").toggle();
+            });
+
+            $("#seeAllHotels").click(function() {
+                $("hotelPlaceholderDiv").toggle();
+                $(this).hide();
+            });
+        });
+
+    </script>
+    
+    <script src = 'App.js'></script>
+
+</body>
+</html>
