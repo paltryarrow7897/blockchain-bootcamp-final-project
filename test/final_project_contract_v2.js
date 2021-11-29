@@ -12,6 +12,7 @@ contract("finalProjectContractV2", function (accounts) {
   const visitorWallet = accounts[2];
 
   const registerFee = 10;
+  const refundPcnt = 60;
 
 /*
   it("should assert true", async function () {
@@ -21,9 +22,17 @@ contract("finalProjectContractV2", function (accounts) {
 */
 
   beforeEach(async () => {
-    instance = await finalProjectContractV2.new(registerFee, 60, 2);
-    const usdToWei = (await instance.getLatestPrice()).toNumber();
-    await instance.registerHotel("H1", "HA1", 10, 1, "HI1", { from: ownerWallet, value: registerFee * usdToWei});
+    instance = await finalProjectContractV2.new(10,60,2);
+    const usdToWei = 232156720000000//(await instance.getLatestPrice()).toNumber();
+    await instance.registerHotel(
+      "FirstHotelName", 
+      "FirstHotelAddress", 
+      100, 
+      1, 
+      "https://www.hotelimageurl.com", {
+         from: ownerWallet, 
+         value: registerFee * usdToWei
+        });
   });
 
 /*
@@ -33,18 +42,59 @@ contract("finalProjectContractV2", function (accounts) {
 */
 
   it("#1 should take only register fee to add a hotel", async () => {
-    const usdToWei = (await instance.getLatestPrice()).toNumber();
     const balanceBefore = await web3.eth.getBalance(instance.address);
 
     await instance.registerHotel(
-      "hotelName", "hotelAddress", 10, 25, "hotelImg", {
-        from: hotelWallet, value: registerFee * usdToWei
+      "hotelName", 
+      "hotelAddress", 
+      10, 
+      5, 
+      "hotelImg", {
+        from: hotelWallet, 
+        value: 10 * usdToWei
       });
 
     const balanceAfter = await web3.eth.getBalance(instance.address);
-    assert.equal(balanceAfter - balanceBefore, registerFee * usdToWei);
+    assert.equal(balanceAfter - balanceBefore, 10 * usdToWei);
   });
 
+describe("Book Hotel", () => {
+  it("#2 should take booking fee from the visitor and block refundable funds", async () => {
+    const contractBalanceBefore = await web3.eth.getBalance(instance.address);
+    const currentTime = Math.floor(new Date().getTime()/1000.0);
+
+    await instance.bookHotel(
+      1, 
+      1, 
+      currentTime + 259200, 
+      currentTime + 518400, {
+        from: visitorWallet,
+        value: 1 * 3 * usdToWei
+      });
+
+    const contractBalanceAfter = await web3.eth.getBalance(instance.address);
+    assert.equal(contractBalanceAfter - contractBalanceBefore, Math.floor((3*usdToWei*60)/100));
+  });
+
+  it("#3 should take booking fee from the visitor and transfer non-refundabe funds to the hotel", async() => {
+    const hotelBalanceBefore = await web3.eth.getBalance(hotelWallet);
+    const currentTime = Math.floor(new Date().getTime()/1000.0);
+
+    await instance.bookHotel(
+      1, 
+      1, 
+      currentTime + 259200, 
+      currentTime + 518400, {
+        from: visitorWallet,
+        value: 1 * 3 * usdToWei
+      });
+
+    const hotelBalanceAfter = await web3.eth.getBalance(hotelWallet);
+    assert.equal(hotelBalanceAfter - hotelBalanceBefore, Math.floor((3*usdToWei*40)/100));
+  });
+});
+
+/*
   it("#2 should check if visitor books in booking period", async () => {
     const usdToWei = (await instance.getLatestPrice()).toNumber();
     const currentTime = Math.floor(new Date().getTime()/1000.0);
@@ -54,7 +104,6 @@ contract("finalProjectContractV2", function (accounts) {
     
   });
 
-/*
   it("#3 should revert if rooms are not available", async () => {
 
   });

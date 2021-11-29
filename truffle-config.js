@@ -75,7 +75,7 @@ module.exports = {
       provider: () => new HDWalletProvider(mnemonic, process.env.INFURA_URL),
       network_id: "42",
       gas: 5500000,
-      networkCheckTimeout: 1000000
+      networkCheckTimeout: 1000000,
     }
     // Useful for private networks
     // private: {
