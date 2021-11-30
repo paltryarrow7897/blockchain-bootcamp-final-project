@@ -56,4 +56,5 @@ https://www.loom.com/share/b6bc6f194b944a799d99c7d8961dec82
 
 
 Note: Hugely inspired by https://github.com/jsur/blockchain-developer-bootcamp-final-project
+
 Note to self and everyone else: I know it's not the best work but to me, I've surpassed my expectations. It still needs a lot of work but I'm glad I got to learn and make something at this bootcamp. Glad I joined. Thanks everyone at Consensys and people on Discord.
