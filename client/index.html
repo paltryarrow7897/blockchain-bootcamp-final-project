@@ -17,9 +17,13 @@
     <style>
         html {
             font-family: Arial, sans-serif;
-            max-width: 500px;
+            max-width: 100%;
             margin: auto;
             color: #666;
+        }
+
+        h2 {
+            text-align: center;
         }
 
         .imageContainer {
@@ -85,26 +89,47 @@
             margin-left: auto;
         }
 
+        #mm-connect {
+            display: none;
+            padding: auto;
+        }
+
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .right {
+            float: right;
+            padding: 10px;
+        }
+
+        .left {
+            float: left;
+            padding: 10px;
+        }
 
     </style>
 
-    <div> Commission free Hotel Booking Dapp. </div>
     <br>
-    <div id = "mm-detected"></div>
+    <div><h2> Commission free Hotel Booking Dapp. </h2></div>
     <br>
-    <div>
+    <hr>
+    <br>
+    <div id = "mm-detected" class="center">
         <button id="mm-connect"> Connect MetaMask </button>
     </div>
     <br>
-    <div id="mm-current-account"></div>
+    <div id="mm-current-account" class="center"></div>
     <br>
 
-    <div id="getLatestPriceDiv">
-        <button id="getLatestPrice"> Get Latest USD/ETH Price </button><br><br>
+    <div id="getLatestPriceDiv" class="right">
+        <button id="getLatestPrice"> Get Current USD/ETH Price </button><br><br>
         <div id="latestPrice"></div>
-    </div><br><br>
+    </div>
 
-    <div id="hotelRegistrationDiv">
+    <div id="hotelRegistrationDiv" class="left">
         <button id='registerHotel'>Register Your Hotel</button>
         <br>
         <form id="registerHotelForm">
@@ -153,7 +178,7 @@
     </div>
 
     <div id="seeAllHotelsDiv">
-        <button id="seeAllHotels">See All Hotels</button>
+        <button id="seeAllHotels" class="center">See All Hotels</button>
         <br><br>
         <div id="hotelsPlaceholderDiv"></div>
     </div>
@@ -181,7 +206,6 @@
 
             $("#seeAllHotels").click(function() {
                 $("hotelPlaceholderDiv").toggle();
-                $(this).hide();
             });
         });
 

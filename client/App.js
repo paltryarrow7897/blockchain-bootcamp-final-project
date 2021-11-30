@@ -1,731 +1,752 @@
-const finalProjectContractAddress = '0x5288a79a79214fCc88F15e0E480010067643e6b9'
+const finalProjectContractAddress = '0x92760b10251e90f9dFcc3877117cEc615345990C'
 const finalProjectContractABI = [
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_registerFee",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_refundPercent",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_refundPeriod",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "bookingId",
-          "type": "uint256"
-        },
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "visitor",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "hotelId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "rooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bookingTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "fromTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "toTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bookingCost",
-              "type": "uint256"
-            },
-            {
-              "internalType": "enum finalProjectContractV2.State",
-              "name": "status",
-              "type": "uint8"
-            }
-          ],
-          "indexed": false,
-          "internalType": "struct finalProjectContractV2.Booking",
-          "name": "newBooking",
-          "type": "tuple"
-        }
-      ],
-      "name": "Booked",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "bookingId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "refundVisitor",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "timestamp",
-          "type": "uint256"
-        }
-      ],
-      "name": "Cancelled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "bookingId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "timestamp",
-          "type": "uint256"
-        }
-      ],
-      "name": "Completed",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "hotelId",
-          "type": "uint256"
-        },
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "hotelOwner",
-              "type": "address"
-            },
-            {
-              "internalType": "string",
-              "name": "hotelName",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "hotelAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "totalRooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "availableRooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "pricePerNight",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "registered",
-              "type": "bool"
-            },
-            {
-              "internalType": "string",
-              "name": "imgUrl",
-              "type": "string"
-            }
-          ],
-          "indexed": false,
-          "internalType": "struct finalProjectContractV2.Hotel",
-          "name": "newHotel",
-          "type": "tuple"
-        }
-      ],
-      "name": "HotelRegistered",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "previousOwner",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "OwnershipTransferred",
-      "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "bookingId",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "hotelId",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "refundPercent",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "refundPeriod",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "registerFee",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [],
-      "name": "renounceOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
-      ],
-      "name": "transferOwnership",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "stateMutability": "payable",
-      "type": "receive",
-      "payable": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_registerFee",
-          "type": "uint256"
-        }
-      ],
-      "name": "setRegisterFee",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_refundPercent",
-          "type": "uint256"
-        }
-      ],
-      "name": "setRefundPercent",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_refundPeriod",
-          "type": "uint256"
-        }
-      ],
-      "name": "setRefundPeriod",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getContractBalance",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "withdrawFunds",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "supplyFunds",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function",
-      "payable": true
-    },
-    {
-      "inputs": [],
-      "name": "getLatestPrice",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_hotelId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getHotelStruct",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "hotelOwner",
-              "type": "address"
-            },
-            {
-              "internalType": "string",
-              "name": "hotelName",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "hotelAddress",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "totalRooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "availableRooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "pricePerNight",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "registered",
-              "type": "bool"
-            },
-            {
-              "internalType": "string",
-              "name": "imgUrl",
-              "type": "string"
-            }
-          ],
-          "internalType": "struct finalProjectContractV2.Hotel",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bookingId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getBookingStruct",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "address",
-              "name": "visitor",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "hotelId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "rooms",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bookingTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "fromTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "toTime",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bookingCost",
-              "type": "uint256"
-            },
-            {
-              "internalType": "enum finalProjectContractV2.State",
-              "name": "status",
-              "type": "uint8"
-            }
-          ],
-          "internalType": "struct finalProjectContractV2.Booking",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_visitor",
-          "type": "address"
-        }
-      ],
-      "name": "getVisitorBookings",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "string",
-          "name": "_name",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "_address",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_totalRooms",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_pricePerNight",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_imgUrl",
-          "type": "string"
-        }
-      ],
-      "name": "registerHotel",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function",
-      "payable": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_hotelId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_rooms",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_nights",
-          "type": "uint256"
-        }
-      ],
-      "name": "getBookingCost",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_hotelId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_rooms",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_fromTime",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_toTime",
-          "type": "uint256"
-        }
-      ],
-      "name": "bookHotel",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "payable",
-      "type": "function",
-      "payable": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bookingId",
-          "type": "uint256"
-        }
-      ],
-      "name": "checkout",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_bookingId",
-          "type": "uint256"
-        }
-      ],
-      "name": "cancelBooking",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ]
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_registerFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_refundPercent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_refundPeriod",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bookingId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "visitor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hotelId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bookingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bookingCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum finalProjectContractV2.State",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct finalProjectContractV2.Booking",
+        "name": "newBooking",
+        "type": "tuple"
+      }
+    ],
+    "name": "Booked",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bookingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "refundVisitor",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "Cancelled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bookingId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "Completed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "hotelId",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "hotelOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "hotelName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hotelAddress",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalRooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableRooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pricePerNight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "registered",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "imgUrl",
+            "type": "string"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct finalProjectContractV2.Hotel",
+        "name": "newHotel",
+        "type": "tuple"
+      }
+    ],
+    "name": "HotelRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "bookingId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "hotelId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "refundPercent",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "refundPeriod",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "registerFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive",
+    "payable": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_registerFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRegisterFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_refundPercent",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRefundPercent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_refundPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "setRefundPeriod",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getContractBalance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawFunds",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "supplyFunds",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
+  },
+  {
+    "inputs": [],
+    "name": "getLatestPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_hotelId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getHotelStruct",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "hotelOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "hotelName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hotelAddress",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalRooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "availableRooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pricePerNight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "registered",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "imgUrl",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct finalProjectContractV2.Hotel",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bookingId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBookingStruct",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "visitor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hotelId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rooms",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bookingTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "fromTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bookingCost",
+            "type": "uint256"
+          },
+          {
+            "internalType": "enum finalProjectContractV2.State",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct finalProjectContractV2.Booking",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_visitor",
+        "type": "address"
+      }
+    ],
+    "name": "getVisitorBookings",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_address",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_totalRooms",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_pricePerNight",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_imgUrl",
+        "type": "string"
+      }
+    ],
+    "name": "registerHotel",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_hotelId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rooms",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nights",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBookingCost",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_hotelId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_rooms",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_fromTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_toTime",
+        "type": "uint256"
+      }
+    ],
+    "name": "bookHotel",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bookingId",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkout",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_bookingId",
+        "type": "uint256"
+      }
+    ],
+    "name": "cancelBooking",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
 
 window.addEventListener('load', function() {
-  
     if (typeof window.ethereum !== 'undefined') {
-      console.log('window.ethereum is enabled')
       if (window.ethereum.isMetaMask === true) {
-        console.log('MetaMask is active')
-        let mmDetected = document.getElementById('mm-detected')
-        mmDetected.innerHTML += 'MetaMask Is Available!'
-  
-        var web3 = new Web3(window.ethereum)
-  
+        let mmDetected = document.getElementById('mm-detected');
+        var web3 = new Web3(window.ethereum);
+        let textNode = document.createTextNode("Connect to Kovan Testnet to continue. ")
+        mmDetected.insertBefore(textNode, mmDetected.childNodes[0]);
+        $("#mm-connect").show();
       } else {
-        console.log('MetaMask is not available')
         let mmDetected = document.getElementById('mm-detected')
-        mmDetected.innerHTML += 'MetaMask Not Available!'
+        let anchor = document.createElement("a");
+        let anchorText = document.createTextNode(" https://metamask.io/ ");
+        anchor.appendChild(anchorText);
+        anchor.setAttribute("href", "https://metamask.io/");
+        anchor.setAttribute("target", "_blank");
+        anchor.setAttribute("rel", "noopener noreferrer");
+        textNode = document.createTextNode("You need MetaMask to continue. Download here: ");
+        mmDetected.appendChild(textNode);
+        mmDetected.appendChild(anchor);
+        $("#hotelRegistrationDiv").hide();
+        $("#getLatestPriceDiv").hide();
+        $("#bookHotelDiv").hide();
+        $("#userBookingsDiv").hide();
+        $("#seeAllHotelsDiv").hide(); 
       }
     } else {
-      console.log('window.ethereum is not found')
       let mmDetected = document.getElementById('mm-detected')
-      mmDetected.innerHTML += '<p>MetaMask Not Available!<p>'
+      let anchor = document.createElement("a");
+      let anchorText = document.createTextNode(" https://metamask.io/ ");
+      anchor.appendChild(anchorText);
+      anchor.setAttribute("href", "https://metamask.io/");
+      anchor.setAttribute("target", "_blank");
+      anchor.setAttribute("rel", "noopener noreferrer");
+      textNode = document.createTextNode("You need MetaMask to continue. Download here: ");
+      mmDetected.appendChild(textNode);
+      mmDetected.appendChild(anchor);
+      $("#hotelRegistrationDiv").hide();
+      $("#getLatestPriceDiv").hide();
+      $("#bookHotelDiv").hide();
+      $("#userBookingsDiv").hide();
+      $("#seeAllHotelsDiv").hide();
     }
-  })
+  });
 
 var web3 = new Web3(window.ethereum)
 
@@ -733,9 +754,9 @@ const mmEnable = document.getElementById('mm-connect');
  
 mmEnable.onclick = async () => {
   await ethereum.request({ method: 'eth_requestAccounts'})
-  console.log(ethereum.selectedAddress);
   var mmCurrentAccount = document.getElementById('mm-current-account');
-  mmCurrentAccount.innerHTML = 'Current Account: ' + ethereum.selectedAddress
+  let currentAccount = ethereum.selectedAddress.substr(0,5) + "..." + ethereum.selectedAddress.substr(-4);
+  mmCurrentAccount.innerHTML = 'Current Account: ' + currentAccount;
 }
 
 const usdToWeiButton = document.getElementById('getLatestPrice');

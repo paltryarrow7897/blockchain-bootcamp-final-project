@@ -113,8 +113,8 @@ contract finalProjectContractV2 is Ownable {
         refundPeriod = _refundPeriod;
     }
     
-    /// @notice function to fetch contract balance, set to only owner, only for fun, will change later
-    function getContractBalance() external view onlyOwner returns (uint256) {
+    /// @notice function to fetch contract balance
+    function getContractBalance() external view returns (uint256) {
         return address(this).balance;
     }
 
