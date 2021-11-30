@@ -1,25 +1,36 @@
 # blockchain-bootcamp-final-project
+## Commission free hotel listing and booking dapp.
 
-Commissionless Hotel Listing and Booking Dapp.
+## Deployed dapp at:
+https://paltryarrow7897-blockchain-bootcamp-project.netlify.app/
 
-Idea:
-Hotels could be the listed on the dapp for some fee.
-Visitors could book rooms on any listed hotels and pay directly and avoid any third party charges.
+## Description:
+Hotels could be the listed on the dapp for a small registration fee. Visitors could book rooms on any listed hotels and pay directly and avoid any third party charges.
+The dapp integrates Chainlink Oracle for USD/ETH Price Feeds. 
 
 Known Limitations:
-Only one type of room could be listed at the moment. Number of rooms is not limited.
-Visitors hvea to execute a transaction to mark their trip completed.
-
-Practical Limitation:
-No knowledge if the registering hotel is real or scam. One solution is to let people vote and display voted hotels at the top of the page.
+1) The dapp assumes that only one type of rooms is available at any hotel. 
+2) Visitors hvea to execute a transaction to mark their trip completed.
+3) As soon as a user books a room, the room is unavailable to book even if the user has to visit at a later date.
+4) No knowledge if the registering hotel is real or a scam.
 
 Working Functions:
-Register Hotel: anyone with an ethereum wallet could list their hotels on the dapp. Registration fee is owner defined. 
-Book Hotel: visitors choose their preferred hotels, enter number of rooms and nights for their stay and pay. 
-Cancel Booking: refunds may be applicable if visitors cancel their booking in a certain period.
+1) Register Hotel: anyone with an ethereum wallet could list their hotels on the dapp. Registration fee is owner defined. 
+2) Book Hotel: visitors choose their hotels, enter number of rooms, from and to dates for their stay and pay. 
+3) Checkout: let a visitor mark a visit completed.
+4) Cancel Booking: refunds may be applicable if visitors cancel their booking in a certain period.
 
-To-Do:
-Chainlink Price Feed to get prices in USD or any other currency.
-Chainlink Keepers to make hotel registration as quarterly renewal service instead of a one time payment.
-Chainlink Keepers to automatically mark trip as completed after the booking duration ends.
-Compound or any other DeFi integration to provide and earn interests on taken registration fes.
+## Future Plans:
+1) Chainlink Keepers to make hotel registration as quarterly renewal service instead of a one time payment.
+2) Chainlink Keepers to automatically mark visit as completed after the booking duration ends.
+3) Compound or any other DeFi integration to provide liquidity and earn interests on taken registration fee.
+4) Add Governance.
+
+## Ethereum Address for certification:
+0x74f5395D628d86C8f7581d1A490dFafFE931de8E
+
+## Directory structure:
+client: Frontend: Built with plain HTML/CSS/JS.
+contracts: Smart Contract: Solidity.
+migrations: Migrations.
+test: Truffle tests.
