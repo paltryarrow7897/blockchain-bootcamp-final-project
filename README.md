@@ -44,10 +44,16 @@ If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 1) git clone 
 2) npm install
 3) truffle console --network kovan
-4) compile
-5) test
+4) test
 
 ## .env variables:
 Store 12 word mnemonic and websocket. https did not work with Kovan for me.
 1) MNEMONIC="..."
 2) INFURA_URL="wss://kovan.infura.io/ws/v3/..."
+
+## Screencast link
+https://www.loom.com/share/b6bc6f194b944a799d99c7d8961dec82
+
+
+Note: Hugely inspired by https://github.com/jsur/blockchain-developer-bootcamp-final-project
+Note to self and everyone else: I know it's not the best work but to me, I've surpassed my expectations. It still needs a lot of work but I'm glad I got to learn and make something at this bootcamp. Glad I joined. Thanks everyone at Consensys and people on Discord.
