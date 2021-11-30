@@ -10,15 +10,15 @@ The dapp integrates Chainlink Oracle for USD/ETH Price Feeds.
 
 Known Limitations:
 1) The dapp assumes that only one type of rooms is available at any hotel. 
-2) Visitors hvea to execute a transaction to mark their trip completed.
+2) Visitors have to execute a transaction to mark their trip completed.
 3) As soon as a user books a room, the room is unavailable to book even if the user has to visit at a later date.
 4) No knowledge if the registering hotel is real or a scam.
 
 Working Functions:
-1) Register Hotel: anyone with an ethereum wallet could list their hotels on the dapp. Registration fee is owner defined. 
+1) Register Hotel: anyone with an ethereum wallet could list their hotels on the dapp. Registration fee is owner defined, to be changed after Governance.
 2) Book Hotel: visitors choose their hotels, enter number of rooms, from and to dates for their stay and pay. 
 3) Checkout: let a visitor mark a visit completed.
-4) Cancel Booking: refunds may be applicable if visitors cancel their booking in a certain period.
+4) Cancel Booking: refunds may be applicable if visitors cancel their booking in a certain period. Refund Percentage and Period owner defined, to be changed after Governance.
 
 ## Future Plans:
 1) Chainlink Keepers to make hotel registration as quarterly renewal service instead of a one time payment.
@@ -30,7 +30,18 @@ Working Functions:
 0x74f5395D628d86C8f7581d1A490dFafFE931de8E
 
 ## Directory structure:
-client: Frontend: Built with plain HTML/CSS/JS.
-contracts: Smart Contract: Solidity.
-migrations: Migrations.
-test: Truffle tests.
+1) client: Frontend: Built with plain HTML/CSS/JS.
+2) contracts: Smart Contract: Solidity.
+3) migrations: Migrations.
+4) test: Truffle tests.
+
+## Deploying on Kovan:
+Because of Chainlink Aggregator dependency, the dapp can not be deployed locally. It needs to be deployed at Kovan testnet.
+
+## Steps to deploy and test: 
+This will need Kovan ETH in 3 wallets - defaultWallet for deploying, 1 as hotelWallet and 1 as visitorWallet.
+1) do a git clone 
+2) npm install
+3) truffle console --network kovan
+4) compile
+5) test
