@@ -46,3 +46,7 @@ If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 3) truffle console --network kovan
 4) compile
 5) test
+
+## .env variables:
+1) MNEMONIC="..."
+2) INFURA_URL="wss://kovan.infura.io/ws/v3/..."
