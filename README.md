@@ -40,7 +40,8 @@ Because of Chainlink Aggregator dependency, the dapp can not be deployed locally
 
 ## Steps to deploy and test: 
 This will need Kovan ETH in 3 wallets - defaultWallet for deploying, 1 as hotelWallet and 1 as visitorWallet.
-1) do a git clone 
+If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
+1) git clone 
 2) npm install
 3) truffle console --network kovan
 4) compile
