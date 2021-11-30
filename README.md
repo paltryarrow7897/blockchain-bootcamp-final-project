@@ -48,5 +48,6 @@ If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 5) test
 
 ## .env variables:
+Store 12 word mnemonic and websocket. https did not work with Kovan for me.
 1) MNEMONIC="..."
 2) INFURA_URL="wss://kovan.infura.io/ws/v3/..."
