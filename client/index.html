@@ -29,12 +29,33 @@
         .imageContainer {
             position: relative;
             width: 100%;
-            max-width: 400px;
+            max-width: 300px;
         }
 
         .imageContainer img {
             width: 100%;
             height: auto;
+        }
+
+        .imageContainer:hover button {
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            background-color: #555;
+            color: white;
+            font-size: 12px;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .imageButton {
+            display: none;
         }
 
         #checkoutForm {
@@ -64,6 +85,8 @@
         }
 
         #bookHotelForm {
+            margin-right: auto;
+            margin-left: auto;
             padding: 15px;
             border: 1px solid #666;
             background: #fff;
@@ -108,8 +131,16 @@
         .left {
             float: left;
             padding: 10px;
+            margin-left: 10px;
         }
 
+        .bordered {
+            border-style: groove;
+        }
+
+        #bookHotelDiv{
+            width: 40%;
+        }
     </style>
 
     <br>
@@ -123,9 +154,10 @@
     <br>
     <div id="mm-current-account" class="center"></div>
     <br>
-
+    <hr>
     <div id="getLatestPriceDiv" class="right">
-        <button id="getLatestPrice"> Get Current USD/ETH Price </button><br><br>
+        <button id="getLatestPrice"> Get Current USD/ETH Price </button>
+        <br>
         <div id="latestPrice"></div>
     </div>
 
@@ -133,59 +165,92 @@
         <button id='registerHotel'>Register Your Hotel</button>
         <br>
         <form id="registerHotelForm">
-            <label for="hotelName"> Hotel Name: </label><input type="text" name="hotelName" id="hotelName"><br><br>
-            <label for="hotelAddress"> Hotel Address: </label><input type="text" name="hotelAddress" id="hotelAddress"><br><br>
-            <label for="hotelTotalRooms"> Total Rooms: </label><input type="number" name="hotelTotalRooms" id="hotelTotalRooms"><br><br>
-            <label for="hotelPricePerNight"> Price Per Night in USD: </label><input type="number" name="hotelPricePerNight" id="hotelPricePerNight"><br><br>
-            <label for="hotelImgUrl"> Image URL: </label><input type="url" name="hotelImgUrl" id="hotelImgUrl"><br><br>
+            <label for="hotelName"> Hotel Name: </label><input type="text" name="hotelName" id="hotelName">
+            <br>
+            <br>
+            <label for="hotelAddress"> Hotel Address: </label><input type="text" name="hotelAddress" id="hotelAddress">
+            <br>
+            <br>
+            <label for="hotelTotalRooms"> Total Rooms: </label><input type="number" name="hotelTotalRooms" id="hotelTotalRooms">
+            <br>
+            <br>
+            <label for="hotelPricePerNight"> Price Per Night in USD: </label><input type="number" name="hotelPricePerNight" id="hotelPricePerNight">
+            <br>
+            <br>
+            <label for="hotelImgUrl"> Image URL: </label><input type="url" name="hotelImgUrl" id="hotelImgUrl">
+            <br>
+            <br>
+            <p id="transactionStatus"></p>
             <button type="button" id="submitRegisterHotel"> Submit </button>
         </form>
         <br>
-    </div><br><br>
-
-    <div id="bookHotelDiv">
+    </div>
+    <div id="bookHotelDiv" class="center">
         <button id="bookHotel">Book Hotel</button>
         <br>
         <form id="bookHotelForm">
-            <label for="bookHotelId"> Hotel ID: </label><input type="number" name="bookHotelId" id="bookHotelId"><br><br>
-            <label for="bookRooms"> Rooms: </label><input type="number" name="bookRooms" id="bookRooms"><br><br>
-            <label for="fromDate"> From: </label><input type="text" name="fromDate" id="fromDate"><input type="text" name="epochFromDate" id="epochFromDate"><br><br>
-            <label for="toDate"> To: </label><input type="text" name="toDate" id="toDate"><input type="text" name="epochToDate" id="epochToDate"><br><br>
+            <label for="bookHotelId"> Hotel ID: </label><input type="number" name="bookHotelId" id="bookHotelId">
+            <br>
+            <br>
+            <label for="bookRooms"> Rooms: </label><input type="number" name="bookRooms" id="bookRooms">
+            <br>
+            <br>
+            <label for="fromDate"> From: <input type="text" name="fromDate" id="fromDate"><input type="text" name="epochFromDate" id="epochFromDate"></label>
+            <br>
+            <br>
+            <label for="toDate"> To: <input type="text" name="toDate" id="toDate"><input type="text" name="epochToDate" id="epochToDate"></label>
+            <br>
+            <br>
+            <p id="bookingTransactionStatus"></p>
             <button type="button" id="submitBookHotel"> Submit </button>
         </form>
         <br>
-    </div><br><br>
-
+    </div>
+    <br>
+    <br>
     <div id="userBookingsDiv">
-        <button id="userBookings">See Your Bookings</button>
-        <br><br>
+        <button id="userBookings" class="right">See Your Bookings</button>
+        <br>
+        <br>
         <div id="userBookingsPlaceholderDiv"></div>
-        <br><br>
-        <button id="cancelBooking">Cancel Booking</button>
         <br>
-        <form id="cancelBookingForm">
-            <label for="cancelBookingId"> Booking ID: </label><input type="number" name="cancelBookingId" id="cancelBookingId"><br><br>
-            <button type="button" id="submitCancelBooking"> Submit </button>
-        </form>
-        <br><br>
-        <button id="checkout">Checkout</button>
         <br>
+        <button id="cancelBooking" class="right">Cancel Booking</button>
+        <br>
+        <div class="right">
+            <form id="cancelBookingForm">
+                <label for="cancelBookingId"> Booking ID: </label><input type="number" name="cancelBookingId" id="cancelBookingId">
+                <br>
+                <br>
+                <button type="button" id="submitCancelBooking"> Submit </button>
+            </form>
+        </div>
+        <br>
+        <br>
+        <button id="checkout" class="right">Checkout</button>
+        <br>
+        <div class="right">
         <form id="checkoutForm">
-            <label for="checkoutBooking"> Checkout Booking ID: </label><input type="number" name="checkoutBooking" id="checkoutBooking"><br><br>
+            <label for="checkoutBooking"> Checkout Booking ID: </label><input type="number" name="checkoutBooking" id="checkoutBooking">
+            <br>
+            <br>
             <button type="button" id="submitCheckout"> Submit </button>
         </form>
-        <br><br>
+        </div>
+        <br>
+        <br>
     </div>
-
+    <hr>
     <div id="seeAllHotelsDiv">
         <button id="seeAllHotels" class="center">See All Hotels</button>
-        <br><br>
+        <br>
+        <br>
         <div id="hotelsPlaceholderDiv"></div>
     </div>
 
     <script>
         $("#fromDate").datepicker({minDate: 1, maxDate: "+1W", altField: "#epochFromDate", altFormat: "@"});
-        $("#toDate").datepicker({minDate: $("#fromDate").value + 1, altField: "#epochToDate", altFormat: "@"});
+        $("#toDate").datepicker({minDate: 2, altField: "#epochToDate", altFormat: "@"});
 
         $(document).ready(function() {
             $("#registerHotel").click(function() {
@@ -206,11 +271,10 @@
 
             $("#seeAllHotels").click(function() {
                 $("hotelPlaceholderDiv").toggle();
+                $(this).hide();
             });
         });
-
-    </script>
-    
+    </script>  
     <script src = 'App.js'></script>
 
 </body>

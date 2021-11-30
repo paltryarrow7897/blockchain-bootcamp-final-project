@@ -783,6 +783,9 @@ regHotel.onclick = async () => {
   const hotelPricePerNight = document.getElementById('hotelPricePerNight').value;
   const hotelImgUrl = document.getElementById('hotelImgUrl').value;
 
+  const transactionStatus = document.getElementById("transactionStatus");
+  transactionStatus.innerHTML = "Processing...";
+
   const projectContract = new web3.eth.Contract(finalProjectContractABI, finalProjectContractAddress);
   projectContract.setProvider(window.ethereum);
   projectContract.defaultChain = 'kovan';
@@ -806,6 +809,13 @@ regHotel.onclick = async () => {
     hotelImgUrl).send({
       from: ethereum.selectedAddress, 
       value: registerFee * usdToWei
+    })
+    .on('confirmation', function(confirmationNumber, receipt) {
+      transactionStatus.innerHTML = "Confirmed! you can now close this form.";
+      $("#registerHotelForm")[0].reset();
+    })
+    .on('error', function(error, receipt) {
+      transactionStatus.innerHTML = "Something happened, got this error: " + error.code + ":" + error.message;
     });
 
 }
@@ -828,6 +838,8 @@ seeAllHotelsButton.onclick = async () => {
 	} else {
 		for(let i=1; i<=numberOfHotels; i++) {
 			let hotelDiv = document.createElement("div");
+      hotelDiv.classList.add("bordered");
+      hotelDiv.classList.add("left");
 			hotelsPlaceholderDiv.appendChild(hotelDiv);
 
 			let hotelIdDiv = document.createElement("div");
@@ -837,7 +849,14 @@ seeAllHotelsButton.onclick = async () => {
 			let hotelPricePerNightDiv = document.createElement("div");
 			let hotelImageUrlDiv = document.createElement("div");
 			hotelImageUrlDiv.classList.add("imageContainer");
-
+/*
+      let bookHotelButton = document.createElement("button");
+      bookHotelButton.classList.add("imageButton");
+      bookHotelButton.id = "bookButton" + i;
+      hotelImageUrlDiv.appendChild(bookHotelButton);
+      let bookHotelButtonText = document.createTextNode("Book This Hotel");
+      bookHotelButton.appendChild(bookHotelButtonText);
+*/
 			hotelDiv.appendChild(hotelImageUrlDiv);
 			hotelDiv.appendChild(hotelIdDiv);
 			hotelDiv.appendChild(hotelNameDiv);
@@ -862,7 +881,6 @@ seeAllHotelsButton.onclick = async () => {
 			hotelImageUrlDiv.appendChild(hotelImageUrl);
 		}
 	}
-
 }
 
 const bookHotel = document.getElementById("submitBookHotel");
@@ -872,6 +890,9 @@ bookHotel.onclick = async () => {
 	const projectContract = new web3.eth.Contract(finalProjectContractABI, finalProjectContractAddress);
 	projectContract.setProvider(window.ethereum);
 	projectContract.defaultChain = 'kovan';
+
+  const bookingTransactionStatus = document.getElementById("bookingTransactionStatus");
+  bookingTransactionStatus.innerHTML = "Processing...";
 
 	let bookingId, bookingArray;
 	let hotelId = document.getElementById("bookHotelId").value;
@@ -899,11 +920,20 @@ bookHotel.onclick = async () => {
 	).send({
 		from: ethereum.selectedAddress,
 		value: bookingCost * usdToWei
-	});
+	})
+  .on('confirmation', function(confirmationNumber, receipt) {
+    bookingTransactionStatus.innerHTML = "Confirmed! you can now close this form.";
+    $("#bookHotelForm")[0].reset();
+  })
+  .on('error', function(error, receipt) {
+    bookingTransactionStatus.innerHTML = "Something happened, got this error: " + error.code + ":" + error.message;
+  });
 }
 
 const userBookings = document.getElementById("userBookings");
 userBookings.onclick = async () => {
+  $("#userBookings").hide();
+
 	var web3 = new Web3(window.ethereum);
 
 	const projectContract = new web3.eth.Contract(finalProjectContractABI, finalProjectContractAddress);
@@ -920,22 +950,52 @@ userBookings.onclick = async () => {
 		for(let i=0; i<numberOfBookings.length; i++) {
 			let bookingDiv = document.createElement("div");
 			userBookingsPlaceholderDiv.appendChild(bookingDiv);
+      bookingDiv.classList.add("bordered");
+      bookingDiv.classList.add("left");
 
 			let bookingIdDiv = document.createElement("div");
 			let hotelIdDiv = document.createElement("div");
 			let fromDateDiv = document.createElement("div");
 			let statusDiv = document.createElement("div");
+/*
+      let checkoutButton = document.createElement("button");
+      let checkoutButtonText = document.createTextNode("Checkout");
+      checkoutButton.classList.add("checkoutButtons");
+      checkoutButton.appendChild(checkoutButtonText);
+      checkoutButton.id = "checkoutButton" + (numberOfBookings[i]);
 
+      let cancelButton = document.createElement("button");
+      let cancelButtonText = document.createTextNode("Cancel");
+      cancelButton.classList.add("cancelButtons");
+      cancelButton.appendChild(cancelButtonText);
+      cancelButton.id = "cancelButton" + (numberOfBookings[i]);
+*/
 			bookingDiv.appendChild(bookingIdDiv);
 			bookingDiv.appendChild(hotelIdDiv);
 			bookingDiv.appendChild(fromDateDiv);
 			bookingDiv.appendChild(statusDiv);
-
+/*
+      bookingDiv.appendChild(checkoutButton);
+      bookingDiv.appendChild(cancelButton);
+*/
 			let bookingArray = await projectContract.methods.getBookingStruct(parseInt(numberOfBookings[i])).call();
 			bookingId = document.createTextNode("Booking ID: " + parseInt(numberOfBookings[i]));
 			hotelId = document.createTextNode("Hotel ID: " + bookingArray[1]);
-			fromDate = document.createTextNode("From Date: " + bookingArray[4]);
-			bookingStatus = document.createTextNode("Status: " + bookingArray[7]);
+
+      let varDate = new Date(bookingArray[4] * 1000);
+			fromDate = document.createTextNode("From Date: " + varDate.toDateString());
+
+      if (bookingArray[7] == 0) {
+        bookingStatus = document.createTextNode("Status: Planned");
+      } else if (bookingArray[7] == 1) {
+        bookingStatus = document.createTextNode("Status: Completed");
+//        $("#checkoutButton"+(numberOfBookings[i])).hide();
+//        $("#cancelButton"+(numberOfBookings[i])).hide();
+      } else {
+        bookingStatus = document.createTextNode("Status: Cancelled");
+//        $("#checkoutButton"+(i+1)).hide();
+//        $("#cancelButton"+(i+1)).hide();
+      }
 
 			bookingIdDiv.appendChild(bookingId);
 			hotelIdDiv.appendChild(hotelId);
@@ -944,6 +1004,58 @@ userBookings.onclick = async () => {
 		}
 	}
 }
+/*
+const checkoutBooking = document.getElementsByClassName("checkoutButtons");
+checkoutBooking.onclick = async () => {
+  var web3 = new Web3(window.ethereum);
+
+  const projectContract = new web3.eth.Contract(finalProjectContractABI, finalProjectContractAddress);
+  projectContract.setProvider(window.ethereum);
+  projectContract.defaultChain = 'kovan';
+
+  let completedBookingId, completedBookingTimestamp;
+  projectContract.once("Completed", (error, event) => {
+    if (!error) {
+      console.log(event);
+      completedBookingId = event.returnValues.bookingId;
+      completedBookingTimestamp = event.returnValues.timestamp;
+    }
+  });
+
+  let buttonId = checkoutBooking.id;
+  let id = buttonId.substr(14);
+  let bookingId = parseInt(id);
+  await projectContract.methods.checkout(bookingId).send({
+    from: ethereum.selectedAddress
+  });
+}
+
+const cancelBooking = document.getElementsByClassName("cancelButtons");
+cancelBooking.onclick = async () => {
+  var web3 = new Web3(window.ethereum);
+
+  const projectContract = new web3.eth.Contract(finalProjectContractABI, finalProjectContractAddress);
+  projectContract.setProvider(window.ethereum);
+  projectContract.defaultChain = 'kovan';
+
+  let cancelledBookingId, refundVisitor, cancelledBookingTimestamp;
+  projectContract.once("Cancelled", (error, event) => {
+    if (!error) {
+      console.log(event);
+      cancelledBookingId = event.returnValues.bookingId;
+      refundVisitor = event.returnValues.refundVisitor;
+      cancelledBookingTimestamp = event.returnValues.timestamp;
+    }
+  });
+
+  let buttonId = cancelBooking.id;
+  let id = buttonId.substr(12);
+  let bookingId = parseInt(id);
+  await projectContract.methods.cancelBooking(bookingId).send({
+    from: ethereum.selectedAddress
+  });
+}
+*/
 
 const checkoutBooking = document.getElementById("submitCheckout");
 checkoutBooking.onclick = async () => {
