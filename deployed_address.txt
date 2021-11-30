@@ -1,0 +1,2 @@
+Address: 0x92760b10251e90f9dFcc3877117cEc615345990C
+Network: Kovan testnet (network id: 42)
