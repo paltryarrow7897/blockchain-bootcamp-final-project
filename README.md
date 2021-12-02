@@ -36,7 +36,7 @@ Working Functions:
 4) test: Truffle tests.
 
 ## Deploy on Kovan or forked mainnet/kovan testnet:
-# Steps to deploy and test on public Kovan: 
+### Steps to deploy and test on public Kovan: 
 This will need Kovan ETH in 3 wallets - defaultWallet for deploying, 1 as hotelWallet and 1 as visitorWallet.
 If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 1) git clone 
@@ -44,7 +44,7 @@ If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 3) truffle console --network kovan
 4) test
 
-# Steps to deploy and test on forked Kovan:
+### Steps to deploy and test on forked Kovan:
 1) git clone
 2) npm install
 3) ganache-cli --fork wss://kovan.infura.io/ws/v3/{infura_project_id}
