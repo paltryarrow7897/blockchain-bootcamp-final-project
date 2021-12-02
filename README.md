@@ -35,16 +35,21 @@ Working Functions:
 3) migrations: Migrations.
 4) test: Truffle tests.
 
-## Deploying on Kovan:
-Because of Chainlink Aggregator dependency, the dapp can not be deployed locally. It needs to be deployed at Kovan testnet.
-
-## Steps to deploy and test: 
+## Deploy on Kovan or forked mainnet/kovan testnet:
+# Steps to deploy and test on public Kovan: 
 This will need Kovan ETH in 3 wallets - defaultWallet for deploying, 1 as hotelWallet and 1 as visitorWallet.
 If fails, try networkCheckTimeout: 1000000 in truffle-config.js.
 1) git clone 
 2) npm install
 3) truffle console --network kovan
 4) test
+
+# Steps to deploy and test on forked Kovan:
+1) git clone
+2) npm install
+3) ganache-cli --fork wss://kovan.infura.io/ws/v3/{infura_project_id}
+4) on a new terminal, truffle console --network development
+5) test
 
 ## .env variables:
 Store 12 word mnemonic and websocket. https did not work with Kovan for me.
