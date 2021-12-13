@@ -3,11 +3,12 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
 /// @title Blockchain Developer Bootcamp Final Project: Hotel Booking dapp.
 /// @author Kushagra Jain (github: paltryarrow7897)
 /// @dev All function calls are currently implemented without side effects.
-contract finalProjectContractV2 is Ownable {
+contract finalProjectContractV2 is Ownable/*, KeeperCompatibleInterface */{
     
     /// @dev uses chainlink aggregator to get ETH price feed
     AggregatorV3Interface internal priceFeed;
@@ -15,12 +16,19 @@ contract finalProjectContractV2 is Ownable {
     // State variables.
     uint256 public hotelId;
     uint256 public bookingId;
-    uint256 public registerFee;
-    uint256 public refundPercent;
-    uint256 public refundPeriod;
+
+    uint256 public registerFee;             // in USD
+    uint256 public refundPercent;           // in %
+    uint256 public refundPeriod;            // in days
+
+    uint256 public renewalFee;              // in USD
+    uint256 public renewalPeriod;           // in months
+
+    uint256[] listOfHotels;
     uint256[] visitorBookings;
 
     enum State {Planned, Completed, Cancelled}
+    enum hotelState {Active, Dormant, Removed}
     
     struct Hotel {
         address hotelOwner;
@@ -31,6 +39,9 @@ contract finalProjectContractV2 is Ownable {
         uint256 pricePerNight;
         bool registered;
         string imgUrl;
+        uint256 regTimestamp;
+        uint256 lastRenewalTimestamp;
+        hotelState hotelStatus;
     }
     
     struct Booking {
@@ -47,6 +58,7 @@ contract finalProjectContractV2 is Ownable {
     // Mappings.
     mapping(uint256 => Hotel) hotelIdToHotel;
     mapping(uint256 => Booking) bookingIdToBooking;
+    mapping(address => uint256[]) hotelOwnerToListOfHotels;
     mapping(address => uint256[]) visitorToVisitorBookings;
     
     
@@ -58,13 +70,36 @@ contract finalProjectContractV2 is Ownable {
     
     receive() external payable {}
     
+    // AggregatorV3Interface(0x9326BFA02ADD2366b30bacB125260Af641031331)
     constructor(uint256 _registerFee, uint256 _refundPercent, uint256 _refundPeriod) {
         registerFee = _registerFee;
         refundPercent = _refundPercent;
         refundPeriod = _refundPeriod;
         priceFeed = AggregatorV3Interface(0x9326BFA02ADD2366b30bacB125260Af641031331);
     }
-    
+/*
+    function checkUpkeep(bytes calldata checkData) external override view returns (bool, bytes memory) {
+        (uint256 _hotelId, uint256 _bookingId) = abi.decode(checkData, (uint256, uint256));
+
+        uint256 _lastRenewalTimestamp = hotelIdToHotel[_hotelId].lastRenewalTimestamp;
+        uint256 _toTime = bookingIdToBooking[_bookingId].toTime;
+
+        bool needSubRenew = (block.timestamp - _lastRenewalTimestamp >= renewalPeriod * 2629743);
+        bool needCheckout = (block.timestamp > _toTime);
+
+        if (needSubRenew && needCheckout) {
+            bool upkeepNeeded = true;
+            bytes performData = abi.encode()
+        }
+        
+        
+        return (upkeepNeeded, bytes(""));
+    }
+
+    function performUpkeep(bytes calldata performData) external override {
+
+    }
+ */   
     
     // Modifiers.
 
@@ -77,6 +112,11 @@ contract finalProjectContractV2 is Ownable {
     /// @notice Checks if @param _rooms number of rooms are available in @param _hotelId hotel
     modifier isAvailable(uint256 _hotelId, uint256 _rooms) {
         require(hotelIdToHotel[_hotelId].availableRooms >= _rooms);
+        _;
+    }
+
+    modifier isActive(uint256 _hotelId) {
+        require(hotelIdToHotel[_hotelId].hotelStatus == hotelState.Active);
         _;
     }
     
@@ -112,7 +152,15 @@ contract finalProjectContractV2 is Ownable {
     function setRefundPeriod(uint256 _refundPeriod) external onlyOwner {
         refundPeriod = _refundPeriod;
     }
-    
+
+    function setRenewalFee(uint256 _renewalFee) external onlyOwner {
+        renewalFee = _renewalFee;
+    }
+
+    function setRenewalPeriod(uint256 _renewalPeriod) external onlyOwner {
+        renewalPeriod = _renewalPeriod;
+    }
+     
     /// @notice function to fetch contract balance
     function getContractBalance() external view returns (uint256) {
         return address(this).balance;
@@ -189,7 +237,10 @@ contract finalProjectContractV2 is Ownable {
                 availableRooms: _totalRooms,
                 pricePerNight: _pricePerNight,
                 imgUrl: _imgUrl,
-                registered: true
+                registered: true,
+                regTimestamp: block.timestamp,
+                lastRenewalTimestamp: block.timestamp,
+                hotelStatus: hotelState.Active
             });
             
             (bool success, ) = address(this).call{value: registerFee * getLatestPrice()}("");
@@ -198,6 +249,18 @@ contract finalProjectContractV2 is Ownable {
             
             emit HotelRegistered(hotelId, newHotel);
             return true;
+    }
+
+    function renewSubscription(uint256 _hotelId) external payable returns (bool) {
+        (bool success, ) = address(this).call{value: renewalFee * getLatestPrice()}("");
+        require(success);
+
+        if (hotelIdToHotel[_hotelId].hotelStatus != hotelState.Active) {
+            hotelIdToHotel[_hotelId].hotelStatus = hotelState.Active;
+        }
+
+        hotelIdToHotel[_hotelId].lastRenewalTimestamp = block.timestamp;
+        return true;
     }
     
     /// @notice Public function to calculate booking cost
@@ -226,7 +289,7 @@ contract finalProjectContractV2 is Ownable {
         uint256 _rooms, 
         uint256 _fromTime, 
         uint256 _toTime) 
-        external payable isRegistered(_hotelId) isAvailable(_hotelId, _rooms) returns (bool) {
+        external payable isRegistered(_hotelId) isActive(_hotelId) isAvailable(_hotelId, _rooms) returns (bool) {
             
             require(_fromTime - block.timestamp <= 604800 && _fromTime - block.timestamp >= 86400);
             require(_toTime - _fromTime >= 86400);
